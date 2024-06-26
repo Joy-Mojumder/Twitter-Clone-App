@@ -5,7 +5,6 @@ import bcrypt from "bcryptjs";
 //^ auth controllers
 // & signup function
 export const signup = async (req, res) => {
-  console.log(req.body);
   try {
     //^ destructuring req.body
     const { fullName, username, email, password } = req.body;
