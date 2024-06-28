@@ -9,7 +9,7 @@ import {
   getSuggestedUsers,
   getUserProfile,
   updateUser,
-} from "../controllers/user.controllers.js";
+} from "../controllers/user.controller.js";
 
 // & initialize router
 const router = express.Router();

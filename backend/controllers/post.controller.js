@@ -118,6 +118,17 @@ export const commentPost = async (req, res) => {
     //^ save post in database
     await post.save();
 
+    //* send notification to post.user
+    const notification = new Notification({
+      sender: userId,
+      receiver: post.user,
+      type: "comment",
+      read: false,
+    });
+
+    //? save notification in database
+    await notification.save();
+
     //^ send response with success message
     return res.status(200).json(post);
   } catch (error) {

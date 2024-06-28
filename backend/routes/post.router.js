@@ -10,7 +10,7 @@ import {
   getLikedPosts,
   getUserPosts,
   likeUnlikePost,
-} from "../controllers/post.controllers.js";
+} from "../controllers/post.controller.js";
 
 const router = express.Router();
 

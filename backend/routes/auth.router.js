@@ -3,7 +3,7 @@ import {
   login,
   logout,
   getMe,
-} from "../controllers/auth.controllers.js";
+} from "../controllers/auth.controller.js";
 import express from "express";
 
 import { protectRoute } from "../middleware/protectRoute.js";
