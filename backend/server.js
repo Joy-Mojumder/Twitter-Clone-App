@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 //^ import routes here
 import authRouter from "./routes/auth.router.js";
 import userRouter from "./routes/user.router.js";
+import postRouter from "./routes/post.router.js";
 
 // ^ environment variables for database connection
 dotenv.config();
@@ -29,6 +30,7 @@ app.use(express.urlencoded({ extended: true })); // for parsing url-encoded requ
 app.use(cookieParser()); // for parsing cookies in requests
 app.use("/api/auth", authRouter); // for handling requests to /api/auth
 app.use("/api/users", userRouter); // for handling requests to /api/users
+app.use("/api/posts", postRouter); // for handling requests to /api/posts
 
 const PORT = process.env.PORT || 5000;
 

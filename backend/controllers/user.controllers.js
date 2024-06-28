@@ -204,6 +204,13 @@ export const updateUser = async (req, res) => {
     }
     //^ update profileImg
     if (profileImg) {
+      // * delete old profileImg from cloudinary
+      if (user.profileImg) {
+        // todo get old profileImg id to delete from cloudinary
+        await cloudinary.uploader.destroy(
+          user.profileImg.split("/").pop().split(".")[0]
+        );
+      }
       // * upload profileImg to cloudinary and store url in profileImg variable
       const uploadResponse = await cloudinary.uploader.upload(profileImg);
 
@@ -212,6 +219,13 @@ export const updateUser = async (req, res) => {
 
     //^ update coverImg in database
     if (coverImg) {
+      // * delete old coverImg from cloudinary
+      if (user.coverImg) {
+        // todo get old coverImg id to delete from cloudinary
+        await cloudinary.uploader.destroy(
+          user.coverImg.split("/").pop().split(".")[0]
+        );
+      }
       // * upload coverImg to cloudinary and store url in coverImg variable
       const uploadResponse = await cloudinary.uploader.upload(coverImg);
 

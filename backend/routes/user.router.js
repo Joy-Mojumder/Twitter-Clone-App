@@ -15,9 +15,9 @@ import {
 const router = express.Router();
 
 // ^ all routes are handled here
-router.get("/profile/:username", protectRoute, getUserProfile);
-router.get("/suggested", protectRoute, getSuggestedUsers);
-router.post("/follow/:userId", protectRoute, followUnfollowUser);
-router.post("/update", protectRoute, updateUser);
+router.get("/profile/:username", protectRoute, getUserProfile); // get user profile
+router.get("/suggested", protectRoute, getSuggestedUsers); // get suggested users
+router.post("/follow/:userId", protectRoute, followUnfollowUser); // follow/unfollow user
+router.post("/update", protectRoute, updateUser); // update user profile
 
 export default router;
