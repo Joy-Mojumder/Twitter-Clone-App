@@ -5,7 +5,7 @@ import { FaRegBookmark } from "react-icons/fa6";
 import { FaTrash } from "react-icons/fa";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useLikeUnlikePosts } from "../../hooks/useLikeUnlikePosts";
 import { useCommenting } from "../../hooks/useCommenting";
 import { useDeletePost } from "../../hooks/useDeletePost";
@@ -23,11 +23,13 @@ const Post = ({ post }) => {
 
   const { deletePost, isPending } = useDeletePost();
 
-  const queryClient = useQueryClient();
-
+  //^ use like unlike posts
   const { LikeUnlike, isPendingLike } = useLikeUnlikePosts();
 
-  const [isLiking, setIsLiking] = useState(false);
+  const [isLiked, setIsLiked] = useState({
+    liked: post.likes.includes(authUser?._id),
+    likesCount: post.likes.length,
+  });
 
   //^check is my post or not
   const postOwner = post.user;
@@ -63,12 +65,12 @@ const Post = ({ post }) => {
   const handleLikePost = (postId) => {
     LikeUnlike(postId);
 
-    setIsLiking(true);
-
-    setTimeout(() => {
-      setIsLiking(isPendingLike);
-      queryClient.invalidateQueries({ queryKey: ["posts"] });
-    }, 1000);
+    setIsLiked({
+      liked: !isLiked.liked,
+      likesCount: isLiked.liked
+        ? isLiked.likesCount - 1
+        : isLiked.likesCount + 1,
+    });
   };
 
   //^ format date here
@@ -214,28 +216,26 @@ const Post = ({ post }) => {
                   0
                 </span>
               </div>
-              {isLiking ? (
+              {isPendingLike ? (
                 <span className="loading loading-spinner loading-sm"></span>
               ) : (
                 <div
                   className="flex gap-1 items-center group cursor-pointer"
                   onClick={() => handleLikePost(post._id)}
                 >
-                  {!post.likes.includes(authUser?._id) && (
+                  {!isLiked.liked && (
                     <FaRegHeart className="w-4 h-4 cursor-pointer text-slate-500 group-hover:text-pink-500" />
                   )}
-                  {post.likes.includes(authUser?._id) && (
+                  {isLiked.liked && (
                     <FaRegHeart className="w-4 h-4 cursor-pointer text-pink-500 " />
                   )}
 
                   <span
                     className={`text-sm text-slate-500 group-hover:text-pink-500 ${
-                      post.likes.includes(authUser?._id)
-                        ? "text-pink-500"
-                        : "text-slate-500"
+                      isLiked.liked ? "text-pink-500" : "text-slate-500"
                     }`}
                   >
-                    {post.likes.length}
+                    {isLiked.likesCount}
                   </span>
                 </div>
               )}
