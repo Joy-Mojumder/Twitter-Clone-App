@@ -1,39 +1,51 @@
-import { useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 
 import Posts from "../../components/common/Posts";
 import ProfileHeaderSkeleton from "../../components/skeletons/ProfileHeaderSkeleton";
 import EditProfileModel from "./EditProfileModel";
 
-import { POSTS } from "../../utils/db/dummy";
-
 import { FaArrowLeft } from "react-icons/fa6";
 import { IoCalendarOutline } from "react-icons/io5";
 import { FaLink } from "react-icons/fa";
 import { MdEdit } from "react-icons/md";
+import { useQuery } from "@tanstack/react-query";
+import { useUDUserIMG } from "../../hooks/useUDUserIMG";
+import { useUserProfile } from "../../hooks/useUserProfile";
+import { formatMemberSinceDate } from "../../utils/date";
+import { useFollowUnfollowUsers } from "../../hooks/useFollowUnfollowUsers";
 
 const ProfilePage = () => {
-  const [coverImg, setCoverImg] = useState(null);
-  const [profileImg, setProfileImg] = useState(null);
+  const [coverImg, setCoverImg] = useState("");
+  const [profileImg, setProfileImg] = useState("");
   const [feedType, setFeedType] = useState("posts");
 
   const coverImgRef = useRef(null);
   const profileImgRef = useRef(null);
 
-  const isLoading = false;
-  const isMyProfile = true;
+  const { editProfileImg, isPendingImg } = useUDUserIMG();
 
-  const user = {
-    _id: "1",
-    fullName: "John Doe",
-    username: "johndoe",
-    profileImg: "/avatars/boy2.png",
-    coverImg: "/cover.png",
-    bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    link: "https://youtube.com/@asaprogrammer_",
-    following: ["1", "2", "3"],
-    followers: ["1", "2", "3"],
-  };
+  //^ get profile username from url
+  const { username } = useParams();
+
+  const { user, refetch, isRefetching, isLoading } = useUserProfile();
+
+  const { data: authUser } = useQuery({
+    queryKey: ["authUser"],
+  });
+
+  const { followUnfollowUser, isPendingFollowUnfollow } =
+    useFollowUnfollowUsers();
+
+  const isMyProfile = authUser._id === user?._id;
+
+  const amIFollowing = authUser?.following?.includes(user?._id);
+
+  const { data: POSTS } = useQuery({
+    queryKey: ["posts"],
+  });
+
+  const memberSince = formatMemberSinceDate(user?.createdAt);
 
   const handleImgChange = (e, state) => {
     const file = e.target.files[0];
@@ -47,16 +59,27 @@ const ProfilePage = () => {
     }
   };
 
+  const handleUpdateProfile = () => {
+    editProfileImg({
+      coverImg,
+      profileImg,
+    });
+  };
+
+  useEffect(() => {
+    refetch();
+  }, [username, refetch]);
+
   return (
     <>
       <div className="flex-[4_4_0]  border-r border-gray-700 min-h-screen ">
         {/* HEADER */}
-        {isLoading && <ProfileHeaderSkeleton />}
-        {!isLoading && !user && (
+        {isLoading || (isRefetching && <ProfileHeaderSkeleton />)}
+        {!isLoading && !isRefetching && !user && (
           <p className="text-center text-lg mt-4">User not found</p>
         )}
         <div className="flex flex-col">
-          {!isLoading && user && (
+          {!isLoading && !isRefetching && user && (
             <>
               <div className="flex gap-10 px-4 py-2 items-center">
                 <Link to="/">
@@ -72,7 +95,7 @@ const ProfilePage = () => {
               {/* COVER IMG */}
               <div className="relative group/cover">
                 <img
-                  src={coverImg || user?.coverImg || "/cover.png"}
+                  src={coverImg || user?.coverImg || "/Welcome To TWitt.png"}
                   className="h-52 w-full object-cover"
                   alt="cover image"
                 />
@@ -106,7 +129,7 @@ const ProfilePage = () => {
                       src={
                         profileImg ||
                         user?.profileImg ||
-                        "/avatar-placeholder.png"
+                        "/avatar-placeholder-image.jpg"
                       }
                     />
                     <div className="absolute top-5 right-3 p-1 bg-primary rounded-full group-hover/avatar:opacity-100 opacity-0 cursor-pointer">
@@ -125,17 +148,29 @@ const ProfilePage = () => {
                 {!isMyProfile && (
                   <button
                     className="btn btn-outline rounded-full btn-sm"
-                    onClick={() => alert("Followed successfully")}
+                    onClick={() => followUnfollowUser(user._id)}
+                    disabled={isPendingFollowUnfollow}
                   >
-                    Follow
+                    {isPendingFollowUnfollow ? (
+                      <span className="loading loading-spinner loading-sm"></span>
+                    ) : amIFollowing ? (
+                      "Unfollow"
+                    ) : (
+                      "Follow"
+                    )}
                   </button>
                 )}
                 {(coverImg || profileImg) && (
                   <button
                     className="btn btn-primary rounded-full btn-sm text-white px-4 ml-2"
-                    onClick={() => alert("Profile updated successfully")}
+                    onClick={handleUpdateProfile}
+                    disabled={isPendingImg}
                   >
-                    Update
+                    {isPendingImg ? (
+                      <span className="loading loading-spinner loading-sm"></span>
+                    ) : (
+                      "Update"
+                    )}
                   </button>
                 )}
               </div>
@@ -150,17 +185,17 @@ const ProfilePage = () => {
                 </div>
 
                 <div className="flex gap-2 flex-wrap">
-                  {user?.link && (
+                  {user?.links && (
                     <div className="flex gap-1 items-center ">
                       <>
                         <FaLink className="w-3 h-3 text-slate-500" />
                         <a
-                          href="https://youtube.com/@asaprogrammer_"
+                          href={user?.links}
                           target="_blank"
                           rel="noreferrer"
                           className="text-sm text-blue-500 hover:underline"
                         >
-                          youtube.com/@asaprogrammer_
+                          {user?.links || "https://youtube.com"}
                         </a>
                       </>
                     </div>
@@ -168,7 +203,7 @@ const ProfilePage = () => {
                   <div className="flex gap-2 items-center">
                     <IoCalendarOutline className="w-4 h-4 text-slate-500" />
                     <span className="text-sm text-slate-500">
-                      Joined July 2021
+                      {memberSince}
                     </span>
                   </div>
                 </div>
@@ -210,7 +245,7 @@ const ProfilePage = () => {
             </>
           )}
 
-          <Posts />
+          <Posts feedType={feedType} username={username} userId={user?._id} />
         </div>
       </div>
     </>

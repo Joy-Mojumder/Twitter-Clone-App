@@ -21,7 +21,6 @@ export const getNotifications = async (req, res) => {
     res.status(200).json(notifications);
   } catch (error) {
     // ^ error handling for getNotifications controller
-    console.log("Error in getNotifications controller:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
@@ -45,7 +44,6 @@ export const deleteAllNotifications = async (req, res) => {
     res.status(200).json({ message: `Notifications deleted successfully` });
   } catch (error) {
     // ^ error handling for deleteNotifications controller
-    console.log("Error in deleteNotifications controller:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
@@ -81,7 +79,6 @@ export const deleteSelectedNotification = async (req, res) => {
     res.status(200).json({ message: "Notification deleted successfully" });
   } catch (error) {
     // ^ error handling for deleteSelectedNotification controller
-    console.log("Error in deleteSelectedNotification controller:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };

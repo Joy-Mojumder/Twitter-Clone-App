@@ -10,7 +10,7 @@ export const createPost = async (req, res) => {
     //^ destructuring req.body for text and image
     const { text } = req.body;
 
-    let { image } = req.body;
+    let { img } = req.body;
 
     //* getting userId from req.user._id
 
@@ -22,23 +22,23 @@ export const createPost = async (req, res) => {
 
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    //* if user exists check if text or image is present
+    //* if user exists check if text or img is present
 
-    if (!text && !image) {
-      return res.status(400).json({ error: "post must have text or image" });
+    if (!text && !img) {
+      return res.status(400).json({ error: "post must have text or img" });
     }
 
-    //* if image is present, upload image to cloudinary
-    if (image) {
-      const uploadedResponse = await cloudinary.uploader.upload(image);
-      image = uploadedResponse.secure_url;
+    //* if img is present, upload img to cloudinary
+    if (img) {
+      const uploadedResponse = await cloudinary.uploader.upload(img);
+      img = uploadedResponse.secure_url;
     }
 
     //^ all fields are present,then create post
     const newPost = new Post({
       user: userId,
       text,
-      image,
+      img,
     });
 
     //^ save post
@@ -48,7 +48,6 @@ export const createPost = async (req, res) => {
     return res.status(201).json(newPost);
   } catch (error) {
     //^ error handling for createPost controller
-    console.log("Error in createPost controller:", error);
     res.status(500).json({ error: `Internal server error` });
   }
 };
@@ -70,9 +69,9 @@ export const deletePost = async (req, res) => {
     }
 
     //*if post exists and user is authorized then delete image from cloudinary
-    if (post.image) {
+    if (post.img) {
       await cloudinary.uploader.destroy(
-        post.image.split("/").pop().split(".")[0]
+        post.img.split("/").pop().split(".")[0]
       );
     }
 
@@ -83,7 +82,6 @@ export const deletePost = async (req, res) => {
     return res.status(200).json({ message: "Post deleted successfully" });
   } catch (error) {
     //^ error handling for deletePost controller
-    console.log("Error in deletePost controller:", error);
     res.status(500).json({ error: `Internal server error` });
   }
 };
@@ -133,7 +131,6 @@ export const commentPost = async (req, res) => {
     return res.status(200).json(post);
   } catch (error) {
     //^ error handling for commentPost controller
-    console.log("Error in commentPost controller:", error);
     res.status(500).json({ error: `Internal server error` });
   }
 };
@@ -187,7 +184,6 @@ export const likeUnlikePost = async (req, res) => {
     }
   } catch (error) {
     //^ error handling for likeUnlikePost controller
-    console.log("Error in likeUnlikePost controller:", error);
     res.status(500).json({ error: `Internal server error` });
   }
 };
@@ -214,7 +210,6 @@ export const getAllPosts = async (req, res) => {
     return res.status(200).json(posts);
   } catch (error) {
     //^ error handling for getAllPosts controller
-    console.log("Error in getAllPosts controller:", error);
     res.status(500).json({ error: `Internal server error` });
   }
 };
@@ -246,7 +241,6 @@ export const getLikedPosts = async (req, res) => {
     res.status(200).json(likedPosts);
   } catch (error) {
     //^ error handling for getLikedPosts controller
-    console.log("Error in getLikedPosts controller:", error);
     res.status(500).json({ error: `Internal server error` });
   }
 };
@@ -278,7 +272,6 @@ export const getFollowingPosts = async (req, res) => {
     res.status(200).json(followingPosts);
   } catch (error) {
     //^ error handling for getFollowingPosts controller
-    console.log("Error in getFollowingPosts controller:", error);
     res.status(500).json({ error: `Internal server error` });
   }
 };
@@ -310,7 +303,6 @@ export const getUserPosts = async (req, res) => {
     res.status(200).json(userPosts);
   } catch (error) {
     //^ error handling for getUserPosts controller
-    console.log("Error in getUserPosts controller:", error);
     res.status(500).json({ error: `Internal server error` });
   }
 };

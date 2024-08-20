@@ -1,17 +1,24 @@
 import { Link } from "react-router-dom";
 import RightPanelSkeleton from "../skeletons/RightPanelSkeleton";
-import { USERS_FOR_RIGHT_PANEL } from "../../utils/db/dummy";
+import { useRTSuggestedUsers } from "../../hooks/useRTSuggestedUsers";
+import { useFollowUnfollowUsers } from "../../hooks/useFollowUnfollowUsers";
 
 const RightPanel = () => {
-  const isLoading = false;
+  const { suggestedRtUsers, isLoadingSuggested } = useRTSuggestedUsers();
 
+  const { followUnfollowUser, isPendingFollowUnfollow } =
+    useFollowUnfollowUsers();
+
+  const handleFollowUnfollowUser = (userId) => {
+    followUnfollowUser(userId);
+  };
   return (
     <div className="hidden lg:block my-4 mx-2">
       <div className="bg-[#16181C] p-4 rounded-md sticky top-2">
         <p className="font-bold">Who to follow</p>
         <div className="flex flex-col gap-4">
           {/* item */}
-          {isLoading && (
+          {isLoadingSuggested && (
             <>
               <RightPanelSkeleton />
               <RightPanelSkeleton />
@@ -19,8 +26,8 @@ const RightPanel = () => {
               <RightPanelSkeleton />
             </>
           )}
-          {!isLoading &&
-            USERS_FOR_RIGHT_PANEL?.map((user) => (
+          {!isLoadingSuggested &&
+            suggestedRtUsers?.map((user) => (
               <Link
                 to={`/profile/${user.username}`}
                 className="flex items-center justify-between gap-4"
@@ -29,7 +36,9 @@ const RightPanel = () => {
                 <div className="flex gap-2 items-center">
                   <div className="avatar">
                     <div className="w-8 rounded-full">
-                      <img src={user.profileImg || "/avatar-placeholder.png"} />
+                      <img
+                        src={user.profileImg || "/avatar-placeholder-image.jpg"}
+                      />
                     </div>
                   </div>
                   <div className="flex flex-col">
@@ -44,9 +53,14 @@ const RightPanel = () => {
                 <div>
                   <button
                     className="btn bg-white text-black hover:bg-white hover:opacity-90 rounded-full btn-sm"
-                    onClick={(e) => e.preventDefault()}
+                    onClick={() => handleFollowUnfollowUser(user._id)}
+                    disabled={isPendingFollowUnfollow}
                   >
-                    Follow
+                    {isPendingFollowUnfollow ? (
+                      <span className="loading loading-spinner loading-sm"></span>
+                    ) : (
+                      "Follow"
+                    )}
                   </button>
                 </div>
               </Link>

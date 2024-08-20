@@ -13,17 +13,34 @@ export const signup = async (req, res) => {
     if (!emailRegex.test(email)) {
       return res.status(400).json({ error: "Invalid email address" });
     }
-    //^ check if user already exists
-    const existingUser = await User.findOne({ username });
-    if (existingUser) {
-      return res.status(400).json({ error: "User already exists" });
-    }
     //^ check if email already exists
     const existingEmail = await User.findOne({ email });
     if (existingEmail) {
       return res.status(400).json({ error: "Email already exists" });
     }
-    //^ check if password is less than 6 characters
+    //^ check if username already exists
+    const existingUsername = await User.findOne({ username });
+    if (existingUsername) {
+      return res.status(400).json({ error: "Username already exists" });
+    }
+    //^ check if fullName already exists
+    const existingFullName = await User.findOne({ fullName });
+    if (existingFullName) {
+      return res.status(400).json({ error: "Full name already exists" });
+    }
+    //* check if username is less than 3 characters
+    if (username.length < 3) {
+      return res
+        .status(400)
+        .json({ error: "Username must be at least 3 characters long" });
+    }
+    //* check if fullName is less than 3 characters
+    if (fullName.length < 3) {
+      return res
+        .status(400)
+        .json({ error: "Full name must be at least 3 characters long" });
+    }
+    //* check if password is less than 6 characters
     if (password.length < 6) {
       return res
         .status(400)
@@ -57,7 +74,6 @@ export const signup = async (req, res) => {
       res.status(400).json({ error: "Invalid user data" });
     }
   } catch (error) {
-    console.log("Error in signup:", error);
     res.status(500).json({ error: `Internal server error` });
   }
 };
@@ -97,7 +113,6 @@ export const login = async (req, res) => {
     });
   } catch (error) {
     //^ error handling for login
-    console.log("Error in login:", error);
     res.status(500).json({ error: `Internal server error` });
   }
 };
@@ -113,7 +128,6 @@ export const logout = async (req, res) => {
     res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
     //^ error handling for logout
-    console.log("Error in logout:", error);
     res.status(500).json({ error: `Internal server error` });
   }
 };
@@ -128,7 +142,6 @@ export const getMe = async (req, res) => {
     res.status(200).json(user);
   } catch (error) {
     //* error handling for getMe controller
-    console.log("Error in getMe controller:", error);
     res.status(500).json({ error: `Internal server error` });
   }
 };

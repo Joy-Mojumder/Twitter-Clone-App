@@ -9,6 +9,7 @@ import {
   getSuggestedUsers,
   getUserProfile,
   updateUser,
+  updateImgUser,
 } from "../controllers/user.controller.js";
 
 // & initialize router
@@ -19,5 +20,6 @@ router.get("/profile/:username", protectRoute, getUserProfile); // get user prof
 router.get("/suggested", protectRoute, getSuggestedUsers); // get suggested users
 router.post("/follow/:userId", protectRoute, followUnfollowUser); // follow/unfollow user
 router.post("/update", protectRoute, updateUser); // update user profile
+router.post("/updateImg", protectRoute, updateImgUser); // update user profile image
 
 export default router;

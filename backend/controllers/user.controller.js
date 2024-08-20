@@ -21,7 +21,6 @@ export const getUserProfile = async (req, res) => {
     res.status(200).json(user);
   } catch (error) {
     // ^ error handling for getUserProfile controller
-    console.log("Error in getUserProfile controller:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
@@ -88,7 +87,6 @@ export const followUnfollowUser = async (req, res) => {
     }
   } catch (error) {
     // ^ error handling for followUnfollowUser controller
-    console.log("Error in followUnfollowUser controller:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
@@ -132,7 +130,6 @@ export const getSuggestedUsers = async (req, res) => {
     res.status(200).json(suggestedUsers);
   } catch (error) {
     // ^ error handling for getSuggestedUsers controller
-    console.log("Error in getSuggestedUsers controller:", error.message);
     res.status(500).json({ error: "Internal server error" });
   }
 };
@@ -150,9 +147,6 @@ export const updateUser = async (req, res) => {
     links,
   } = req.body;
 
-  //^ destructuring profileImg & coverImg from req.body
-  const { profileImg, coverImg } = req.body;
-
   //^ defining userId from req.user._id
   const userId = req.user._id;
 
@@ -163,6 +157,12 @@ export const updateUser = async (req, res) => {
     // * check if user exists in database
     if (!user) {
       return res.status(404).json({ error: "User not found" });
+    }
+
+    if (!currentPassword) {
+      return res
+        .status(400)
+        .json({ error: "Please provide your current password" });
     }
 
     // * check if new password & current password both provided or not
@@ -202,6 +202,39 @@ export const updateUser = async (req, res) => {
       // * update password in database
       user.password = hashedPassword;
     }
+
+    // ^ update all fields in database
+    user.fullName = fullName || user.fullName;
+    user.username = username || user.username;
+    user.email = email || user.email;
+    user.bio = bio || user.bio;
+    user.links = links || user.links;
+
+    // * save user in database
+    user = await user.save();
+
+    // * remove password from user
+    user.password = null;
+
+    // * send response with updated user
+    res.status(200).json(user);
+  } catch (error) {
+    // ^ error handling for updateUser controller
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const updateImgUser = async (req, res) => {
+  //^ destructuring profileImg & coverImg from req.body
+  let { profileImg, coverImg } = req.body;
+
+  const userId = req.user._id;
+  try {
+    let user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ success: false, error: "User not found" });
+    }
     //^ update profileImg
     if (profileImg) {
       // * delete old profileImg from cloudinary
@@ -231,26 +264,16 @@ export const updateUser = async (req, res) => {
 
       coverImg = uploadResponse.secure_url;
     }
-    // ^ update all fields in database
-    user.fullName = fullName || user.fullName;
-    user.username = username || user.username;
-    user.email = email || user.email;
+
+    // * update profileImg and coverImg in database
     user.profileImg = profileImg || user.profileImg;
     user.coverImg = coverImg || user.coverImg;
-    user.bio = bio || user.bio;
-    user.links = links || user.links;
 
     // * save user in database
-    user = await user.save();
+    await user.save();
 
-    // * remove password from user
-    user.password = null;
-
-    // * send response with updated user
-    res.status(200).json(user);
+    res.status(200).json({ success: true, user });
   } catch (error) {
-    // ^ error handling for updateUser controller
-    console.log("Error in updateUser controller:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };

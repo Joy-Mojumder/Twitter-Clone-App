@@ -5,6 +5,8 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 const SignUp = () => {
   //^ gsap animation section
   const container = useRef();
@@ -34,39 +36,64 @@ const SignUp = () => {
   });
 
   //^ form data here
-  const username = useRef();
-  const password = useRef();
+  const [formData, setFormData] = useState({
+    username: "",
+    password: "",
+  });
 
-  const [formData, setFormData] = useState({});
-  const [error, setError] = useState(false);
+  const [Err, setErr] = useState(false);
+
+  const queryClient = useQueryClient();
+
+  const { mutate, isError, isPending, error } = useMutation({
+    mutationFn: async ({ username, password }) => {
+      try {
+        const res = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ username, password }),
+        });
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+        return data;
+      } catch (error) {
+        throw new Error(error);
+      }
+    },
+    onSuccess: () => {
+      toast.success("Logged in successfully");
+      queryClient.invalidateQueries({ queryKey: ["authUser"] });
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    setFormData({
-      username: username.current.value,
-      password: password.current.value,
-    });
-    username.current.value = "";
-    password.current.value = "";
-    if (username.current.value === "" && password.current.value === "") {
-      setError(true);
-      setTimeout(() => {
-        setError(false);
-      }, 4000);
-    }
+    setErr(true);
+    setTimeout(() => {
+      setErr(false);
+    }, 4000);
+    mutate(formData);
   };
 
-  console.log(formData);
+  const handleInputChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
   return (
     <section
-      className="w-full h-screen p-5 lg:px-20 xl:px-28 lg:py-10 grid grid-flow-row lg:grid-cols-2 place-items-center overflow-y-hidden"
+      className="w-full h-screen p-5 grid grid-flow-row lg:grid-cols-2 place-items-center overflow-y-hidden"
       ref={container}
     >
       {/* logo section */}
-      <section className="w-1/2 sm:w-1/3 lg:w-72 xl:w-80 aspect-square">
-        <FcMindMap size={{ base: 60 }} className="icon" />
+      <section>
+        <FcMindMap className="icon size-40 md:size-60 lg:size-80" />
       </section>
       {/* form section */}
-      <section>
+      <section className="self-start lg:self-center">
         <form
           className="w-80 md:w-96 lg:w-80 h-auto flex flex-col gap-4"
           onSubmit={handleSubmit}
@@ -75,33 +102,48 @@ const SignUp = () => {
             Let&#39;s Go
           </h1>
           <label className="input input-bordered flex items-center gap-2 rounded-md lab">
-            <FaUser size={15} />
+            <div>
+              <FaUser size={15} />
+            </div>
             <input
               type="text"
               className="grow"
               placeholder="Username"
-              ref={username}
+              name="username"
+              value={formData.username}
+              onChange={handleInputChange}
             />
           </label>
           <label className="input input-bordered flex items-center gap-2 rounded-md lab">
-            <MdPassword size={15} />
+            <div>
+              <MdPassword size={15} />
+            </div>
             <input
               type="password"
               className="grow"
               placeholder="Password"
-              ref={password}
+              name="password"
+              value={formData.password}
+              onChange={handleInputChange}
             />
           </label>
           <button
             className="btn btn-primary rounded-full hover:bg-cyan-600 border-none button"
             type="submit"
+            disabled={isPending}
           >
-            Login
+            {isPending ? (
+              <span className="loading loading-dots loading-md"></span>
+            ) : (
+              "Login"
+            )}
           </button>
-          {error && (
+          {isError && Err ? (
             <p className="text-red-500 text-center sm:text-xl lg:text-sm lg:text-left">
-              Something went wrong
+              {error.message}
             </p>
+          ) : (
+            ""
           )}
           <h2 className="text-center lab sm:text-xl lg:text-left lg:text-sm">
             Don&#39;t have an account?

@@ -26,7 +26,7 @@ import connectMongoDB from "./database/connectMongoDB.js";
 const app = express();
 
 //^ all routes are handled here
-app.use(express.json()); // for parsing request body
+app.use(express.json({ limit: "5mb" })); // for parsing request body
 app.use(express.urlencoded({ extended: true })); // for parsing url-encoded request body
 app.use(cookieParser()); // for parsing cookies in requests
 app.use("/api/auth", authRouter); // for handling requests to /api/auth

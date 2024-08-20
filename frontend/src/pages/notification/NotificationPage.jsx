@@ -4,34 +4,19 @@ import LoadingSpinner from "../../components/common/LoadingSpinner";
 import { IoSettingsOutline } from "react-icons/io5";
 import { FaUser } from "react-icons/fa";
 import { FaHeart } from "react-icons/fa6";
+import { BiTrash } from "react-icons/bi";
+import {
+  useDeleteAllNotifications,
+  useDeleteNotification,
+  useNotifications,
+} from "../../hooks/useNotifications";
 
 const NotificationPage = () => {
-  const isLoading = false;
-  const notifications = [
-    {
-      _id: "1",
-      from: {
-        _id: "1",
-        username: "johndoe",
-        profileImg: "/avatars/boy2.png",
-      },
-      type: "follow",
-    },
-    {
-      _id: "2",
-      from: {
-        _id: "2",
-        username: "janedoe",
-        profileImg: "/avatars/girl1.png",
-      },
-      type: "like",
-    },
-  ];
+  const { notifications, isLoadingNotifications } = useNotifications();
 
-  const deleteNotifications = () => {
-    alert("All notifications deleted");
-  };
+  const { deleteNotification } = useDeleteNotification();
 
+  const { deleteAllNotifications } = useDeleteAllNotifications();
   return (
     <>
       <div className="flex-[4_4_0] border-l border-r border-gray-700 min-h-screen">
@@ -46,21 +31,26 @@ const NotificationPage = () => {
               className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
             >
               <li>
-                <a onClick={deleteNotifications}>Delete all notifications</a>
+                <a onClick={deleteAllNotifications}>Delete all notifications</a>
               </li>
             </ul>
           </div>
         </div>
-        {isLoading && (
+        {isLoadingNotifications && (
           <div className="flex justify-center h-full items-center">
             <LoadingSpinner size="lg" />
           </div>
         )}
         {notifications?.length === 0 && (
-          <div className="text-center p-4 font-bold">No notifications 🤔</div>
+          <div className="text-center p-4 font-bold">
+            No notifications found
+          </div>
         )}
         {notifications?.map((notification) => (
-          <div className="border-b border-gray-700" key={notification._id}>
+          <div
+            className="border-b border-gray-700 flex justify-between"
+            key={notification._id}
+          >
             <div className="flex gap-2 p-4">
               {notification.type === "follow" && (
                 <FaUser className="w-7 h-7 text-primary" />
@@ -68,26 +58,33 @@ const NotificationPage = () => {
               {notification.type === "like" && (
                 <FaHeart className="w-7 h-7 text-red-500" />
               )}
-              <Link to={`/profile/${notification.from.username}`}>
+              <Link to={`/profile/${notification.sender.username}`}>
                 <div className="avatar">
                   <div className="w-8 rounded-full">
                     <img
                       src={
-                        notification.from.profileImg ||
-                        "/avatar-placeholder.png"
+                        notification.sender.profileImg ||
+                        "/avatar-placeholder-image.jpg"
                       }
                     />
+                    <p>{}</p>
                   </div>
                 </div>
                 <div className="flex gap-1">
                   <span className="font-bold">
-                    @{notification.from.username}
+                    @{notification.sender.username}
                   </span>{" "}
                   {notification.type === "follow"
                     ? "followed you"
                     : "liked your post"}
                 </div>
               </Link>
+            </div>
+            <div className="p-4">
+              <BiTrash
+                className="size-6 hover:text-red-500 cursor-pointer transition duration-200"
+                onClick={() => deleteNotification(notification._id)}
+              />
             </div>
           </div>
         ))}

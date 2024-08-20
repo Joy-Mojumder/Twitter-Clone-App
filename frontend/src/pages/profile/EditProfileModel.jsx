@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useUDUserDetails } from "../../hooks/useUDUserDetails";
 
 const EditProfileModal = () => {
   const [formData, setFormData] = useState({
@@ -15,6 +16,12 @@ const EditProfileModal = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const { editProfileDetails, isPendingDetails } = useUDUserDetails();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    editProfileDetails({ ...formData });
+  };
   return (
     <>
       <button
@@ -28,13 +35,7 @@ const EditProfileModal = () => {
       <dialog id="edit_profile_modal" className="modal">
         <div className="modal-box border rounded-md border-gray-700 shadow-md">
           <h3 className="font-bold text-lg my-3">Update Profile</h3>
-          <form
-            className="flex flex-col gap-4"
-            onSubmit={(e) => {
-              e.preventDefault();
-              alert("Profile updated successfully");
-            }}
-          >
+          <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
             <div className="flex flex-wrap gap-2">
               <input
                 type="text"
@@ -96,8 +97,16 @@ const EditProfileModal = () => {
               name="link"
               onChange={handleInputChange}
             />
-            <button className="btn btn-primary rounded-full btn-sm text-white">
-              Update
+            <button
+              className="btn btn-primary rounded-full btn-sm text-white"
+              disabled={isPendingDetails}
+              type="submit"
+            >
+              {isPendingDetails ? (
+                <span className="loading loading-spinner loading-sm"></span>
+              ) : (
+                "Update"
+              )}
             </button>
           </form>
         </div>
