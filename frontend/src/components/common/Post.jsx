@@ -6,7 +6,7 @@ import { FaTrash } from "react-icons/fa";
 import { FaChartSimple } from "react-icons/fa6";
 
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useLikeUnlikePosts } from "../../hooks/useLikeUnlikePosts";
 import { useCommenting } from "../../hooks/useCommenting";
@@ -26,6 +26,8 @@ const Post = ({ post, feedType }) => {
 
   //^ get auth user from data query
   const { data: authUser } = useQuery({ queryKey: ["authUser"] });
+
+  const navigate = useNavigate();
 
   //^ set post seen or not
   const [postSeen, setPostSeen] = useState({
@@ -178,12 +180,12 @@ const Post = ({ post, feedType }) => {
         post.shares.map((share) => (
           <div
             key={share._id}
-            className="flex gap-2 items-start p-4 border-b border-gray-700"
+            className="flex gap-2 items-start p-2 md:p-4 border-b border-gray-700"
           >
             <div className="avatar">
               <Link
                 to={`/profile/${share.sender.username}`}
-                className="size-12 rounded-full overflow-hidden"
+                className="size-8 md:size-10 lg:size-12 rounded-full overflow-hidden"
               >
                 <img
                   src={
@@ -196,18 +198,18 @@ const Post = ({ post, feedType }) => {
               <div className="flex gap-2 items-center">
                 <Link
                   to={`/profile/${share.sender.username}`}
-                  className="font-bold"
+                  className="font-bold text-sm md:text-base"
                 >
                   {share.sender.fullName}
                 </Link>
-                <span className="text-gray-700 flex gap-1 text-sm">
+                <span className="text-gray-700 flex gap-1 text-[0.6rem] md:text-xs lg:text-sm">
                   <Link to={`/profile/${share.sender.username}`}>
                     @{share.sender.username}
                   </Link>
                 </span>
               </div>
               <div>
-                <span>
+                <span className="text-sm md:text-base lg:text-lg font-bold">
                   This post has been shared by {share.sender.fullName}
                 </span>
               </div>
@@ -215,7 +217,7 @@ const Post = ({ post, feedType }) => {
           </div>
         ))}
       <div
-        className="flex gap-2 items-start p-4 border-b border-gray-700"
+        className="flex gap-2 items-start p-2 md:p-4 border-b border-gray-700"
         onClick={() =>
           setPostSeen({
             seen: postSeen.seen ? true : true,
@@ -228,7 +230,7 @@ const Post = ({ post, feedType }) => {
         <div className="avatar">
           <Link
             to={`/profile/${postOwner.username}`}
-            className="w-8 rounded-full overflow-hidden"
+            className="size-6 md:size-8 rounded-full overflow-hidden"
           >
             <img
               src={postOwner.profileImg || "/avatar-placeholder-image.jpg"}
@@ -237,15 +239,20 @@ const Post = ({ post, feedType }) => {
         </div>
         <div className="flex flex-col flex-1">
           <div className="flex gap-2 items-center">
-            <Link to={`/profile/${postOwner.username}`} className="font-bold">
+            <Link
+              to={`/profile/${postOwner.username}`}
+              className="font-bold text-xs md:text-sm lg:text-base"
+            >
               {postOwner.fullName}
             </Link>
-            <span className="text-gray-700 flex gap-1 text-sm">
+            <span className="text-gray-700 flex gap-1 text-[0.6rem] md:text-xs lg:text-sm">
               <Link to={`/profile/${postOwner.username}`}>
                 @{postOwner.username}
               </Link>
               <span>·</span>
-              <span>{formattedDate}</span>
+              <span className="text-[0.6rem] md:text-xs lg:text-sm">
+                {formattedDate}
+              </span>
             </span>
             {isMyPost && (
               <span className="flex justify-end flex-1">
@@ -261,8 +268,8 @@ const Post = ({ post, feedType }) => {
               </span>
             )}
           </div>
-          <div className="flex flex-col gap-3 overflow-hidden">
-            <span>{post.text}</span>
+          <div className="flex flex-col gap-2 md:gap-3 overflow-hidden">
+            <span className="text-sm md:text-base lg:text-lg">{post.text}</span>
             {post.img && (
               <img
                 src={post.img}
@@ -458,7 +465,12 @@ const Post = ({ post, feedType }) => {
                   </div>
                 </div>
                 <form method="dialog" className="modal-backdrop">
-                  <button className="outline-none">close</button>
+                  <button
+                    className="outline-none"
+                    onClick={() => navigate("/")}
+                  >
+                    close
+                  </button>
                 </form>
               </dialog>
               {isPendingLike ? (
@@ -499,7 +511,7 @@ const Post = ({ post, feedType }) => {
                 {postSeen.seenCount}
               </span>
             </div>
-            <div className="flex w-1/3 justify-end gap-2 items-center">
+            <div className="flex w-1/4 md:w-1/3 justify-end  items-center">
               {isPendingSave ? (
                 <span className="loading loading-spinner loading-sm"></span>
               ) : (

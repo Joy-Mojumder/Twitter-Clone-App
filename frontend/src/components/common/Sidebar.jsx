@@ -18,10 +18,10 @@ const Sidebar = () => {
   });
 
   return (
-    <div className="md:flex-[2_2_0] w-18 max-w-52">
-      <div className="sticky top-0 left-0 h-screen flex flex-col border-r border-gray-700 w-20 md:w-full">
+    <div className="md:flex-[2_2_0] w-16 sm:w-18 max-w-52">
+      <div className="sticky top-0 left-0 h-screen flex flex-col border-r border-gray-700 w-16 sm:w-20 md:w-full">
         <Link to="/" className="flex justify-center md:justify-start">
-          <FcMindMap className="size-10 md:size-12 lg:size-14 relative" />
+          <FcMindMap className="size-8 md:size-10 lg:size-12 xl:size-14 relative" />
           <h1 className="text-2xl absolute top-3 left-14 font-mono hidden md:block">
             TWItt
           </h1>
@@ -30,7 +30,7 @@ const Sidebar = () => {
           <li className="flex justify-center md:justify-start">
             <Link
               to="/"
-              className="flex gap-3 items-center hover:bg-stone-900 transition-all rounded-full duration-300 py-2 pl-2 pr-4 max-w-fit cursor-pointer"
+              className="flex gap-3 items-center hover:bg-stone-900 transition-all rounded-full duration-300 py-2 px-2 md:pl-2 md:pr-4 max-w-fit cursor-pointer"
             >
               <MdHomeFilled className="w-8 h-8" />
               <span className="text-lg hidden md:block">Home</span>
@@ -39,7 +39,7 @@ const Sidebar = () => {
           <li className="flex justify-center md:justify-start">
             <Link
               to="/notifications"
-              className="flex gap-3 items-center hover:bg-stone-900 transition-all rounded-full duration-300 py-2 pl-2 pr-4 max-w-fit cursor-pointer"
+              className="flex gap-3 items-center hover:bg-stone-900 transition-all rounded-full duration-300 py-2 px-2 md:pl-2 md:pr-4 max-w-fit cursor-pointer"
             >
               <IoNotifications className="w-6 h-6" />
               <span className="text-lg hidden md:block">Notifications</span>
@@ -49,7 +49,7 @@ const Sidebar = () => {
           <li className="flex justify-center md:justify-start">
             <Link
               to={`/profile/${authUser?.username}`}
-              className="flex gap-3 items-center hover:bg-stone-900 transition-all rounded-full duration-300 py-2 pl-2 pr-4 max-w-fit cursor-pointer"
+              className="flex gap-3 items-center hover:bg-stone-900 transition-all rounded-full duration-300 py-2 px-2 md:pl-2 md:pr-4 max-w-fit cursor-pointer"
             >
               <FaUser className="w-6 h-6" />
               <span className="text-lg hidden md:block">Profile</span>
@@ -58,7 +58,7 @@ const Sidebar = () => {
           <li className="flex justify-center md:justify-start">
             <Link
               to={`/posts/saved/${authUser?._id}`}
-              className="flex gap-3 items-center hover:bg-stone-900 transition-all rounded-full duration-300 py-2 pl-2 pr-4 max-w-fit cursor-pointer"
+              className="flex gap-3 items-center hover:bg-stone-900 transition-all rounded-full duration-300 py-2 px-2 md:pl-2 md:pr-4 max-w-fit cursor-pointer"
             >
               <BiSolidBookmarkAlt className="w-6 h-6" />
               <span className="text-lg hidden md:block">Saved Posts</span>
@@ -67,7 +67,7 @@ const Sidebar = () => {
           <li className="flex justify-center md:justify-start">
             <Link
               to={`/posts/shared/${authUser?._id}`}
-              className="flex gap-3 items-center hover:bg-stone-900 transition-all rounded-full duration-300 py-2 pl-2 pr-4 max-w-fit cursor-pointer"
+              className="flex gap-3 items-center hover:bg-stone-900 transition-all rounded-full duration-300 py-2 px-2 md:pl-2 md:pr-4 max-w-fit cursor-pointer"
             >
               <FaShareAlt className="w-6 h-6" />
               <span className="text-lg hidden md:block">Share Posts</span>
