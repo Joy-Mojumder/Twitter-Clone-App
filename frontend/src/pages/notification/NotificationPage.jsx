@@ -95,6 +95,9 @@ const NotificationPage = () => {
                     <span>commented on your post</span>
                   )}
                   {notification.type === "like" && <span>liked your post</span>}
+                  {notification.type === "share" && (
+                    <span>shared your post</span>
+                  )}
                 </div>
               </Link>
             </div>
