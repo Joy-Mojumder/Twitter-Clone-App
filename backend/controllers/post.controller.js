@@ -90,7 +90,7 @@ export const deletePost = async (req, res) => {
 export const commentPost = async (req, res) => {
   try {
     //^ destructuring req.body for text
-    const { text } = req.body;
+    const { text, seen } = req.body;
 
     //^ initializing postId & userId
     const postId = req.params.postId;
@@ -112,6 +112,11 @@ export const commentPost = async (req, res) => {
     };
     //* push comment object in comments array of post
     post.comments.push(comment);
+
+    //^ update seen field in post
+    if (seen && !post.seen.includes(userId)) {
+      post.seen.push(userId);
+    }
 
     //^ save post in database
     await post.save();
@@ -137,6 +142,7 @@ export const commentPost = async (req, res) => {
 
 // & likeUnlikePost function
 export const likeUnlikePost = async (req, res) => {
+  const { seen } = req.body;
   try {
     //^ initializing postId
     const postId = req.params.postId;
@@ -161,6 +167,11 @@ export const likeUnlikePost = async (req, res) => {
     } else {
       //* if user has not liked the post then push userId in likes array
       post.likes.push(userId);
+
+      //^ update seen field in post
+      if (seen && !post.seen.includes(userId)) {
+        post.seen.push(userId);
+      }
 
       //^ if user has not liked the post then push postId in likedPosts array
       await User.updateOne({ _id: userId }, { $push: { likedPosts: postId } });
@@ -303,6 +314,181 @@ export const getUserPosts = async (req, res) => {
     res.status(200).json(userPosts);
   } catch (error) {
     //^ error handling for getUserPosts controller
+    res.status(500).json({ error: `Internal server error` });
+  }
+};
+
+//& savePost function
+export const savePosts = async (req, res) => {
+  const { postId } = req.params;
+
+  const { seen } = req.body;
+  const userId = req.user._id;
+  try {
+    //^ check if post exists or not
+    const post = await Post.findById(postId);
+
+    if (!post) return res.status(404).json({ error: "Post not found" });
+
+    //^ check if user already saved the post or not
+    const isSaved = post.saves.includes(userId);
+
+    if (isSaved) {
+      //^ if user already saves the post then pull userId from saves array
+      await Post.updateOne({ _id: postId }, { $pull: { saves: userId } });
+
+      //^if user already savedPosts then pull postId from likes array
+      await User.updateOne({ _id: userId }, { $pull: { savedPosts: postId } });
+
+      return res.status(200).json({ message: "Post unsaved successfully" });
+    } else {
+      //* if user has not saved the post then push userId in likes array
+      post.saves.push(userId);
+
+      //^ update seen field in post
+      if (seen && !post.seen.includes(userId)) {
+        post.seen.push(userId);
+      }
+
+      //^ if user has not saved the post then push postId in savedPosts array
+      await User.updateOne({ _id: userId }, { $push: { savedPosts: postId } });
+
+      //? save post in database
+      await post.save();
+
+      return res.status(200).json({ message: "Post saved successfully" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: `Internal server error` });
+  }
+};
+
+//& getSavedPosts function
+export const getSavedPosts = async (req, res) => {
+  try {
+    //^ initializing userId
+    const userId = req.params.userId;
+
+    //^ check if user exists or not
+    const user = await User.findById(userId);
+
+    //^ if user does not exist then send user not found error
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    //* find all posts that user has saved & populate(getting all details of user) user and comments from database
+    const savedPosts = await Post.find({ _id: { $in: user.savedPosts } })
+      .populate({
+        path: "user",
+        select: "-password",
+      })
+      .populate({
+        path: "comments.user",
+        select: "-password",
+      });
+
+    //* send response with liked posts
+    res.status(200).json(savedPosts);
+  } catch (error) {
+    //^ error handling for getLikedPosts controller
+    res.status(500).json({ error: `Internal server error` });
+  }
+};
+
+//& sharePost function
+export const sharePost = async (req, res) => {
+  const { postId } = req.params;
+  const { receiverId, seen } = req.body;
+
+  const userId = req.user._id;
+
+  if (!receiverId) return res.status(404).json({ error: "Receiver not found" });
+
+  if (!postId) return res.status(404).json({ error: "PostId not found" });
+
+  try {
+    //^ check if post exists or not
+    const post = await Post.findById(postId);
+
+    if (!post) return res.status(404).json({ error: "Post not found" });
+
+    // ^ get my followers from database
+    const myFollowers = await User.findById(userId).select("followers");
+
+    if (myFollowers.followers.includes(receiverId)) {
+      const shareParticipant = {
+        sender: userId,
+        receiver: receiverId,
+      };
+      //* if user has not shared the post then push receiverId in likes array
+      post.shares.push(shareParticipant);
+
+      //^ if user has not shared the post then push postId in sharedPosts array
+      await User.updateOne(
+        { _id: receiverId },
+        { $push: { sharedPosts: postId } }
+      );
+
+      //^ update seen field in post
+      if (seen && !post.seen.includes(userId)) {
+        post.seen.push(userId);
+      }
+
+      //? save post in database
+      await post.save();
+
+      //* send notification to post.user
+      const notification = new Notification({
+        sender: userId,
+        receiver: receiverId,
+        type: "share",
+        read: false,
+      });
+
+      //? save notification in database
+      await notification.save();
+
+      return res.status(200).json({ message: "Post shared successfully" });
+    } else {
+      return res
+        .status(404)
+        .json({ error: "You can only share post with your followers" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: `Internal server error` });
+  }
+};
+
+//& getSharedPosts function
+export const getSharedPosts = async (req, res) => {
+  try {
+    //^ initializing userId
+    const userId = req.params.userId;
+
+    //^ check if user exists or not
+    const user = await User.findById(userId);
+
+    //^ if user does not exist then send user not found error
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    //* find all posts that other users have shared & populate(getting all details of user) user and comments from database
+    const sharedPosts = await Post.find({ _id: { $in: user.sharedPosts } })
+      .sort({ createdAt: -1 })
+      .populate({
+        path: "user",
+        select: "-password",
+      })
+      .populate({
+        path: "comments.user",
+        select: "-password",
+      })
+      .populate({
+        path: "shares.sender",
+        select: "-password",
+      });
+
+    //* send response with liked posts
+    res.status(200).json(sharedPosts);
+  } catch (error) {
     res.status(500).json({ error: `Internal server error` });
   }
 };

@@ -277,3 +277,42 @@ export const updateImgUser = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+// & getYourFollowers function
+export const getYourFollowers = async (req, res) => {
+  const { postId } = req.params;
+  try {
+    const userId = req.user._id;
+
+    //^ get user from database
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    if (!postId) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    //^ get followers from database
+    const myFollowers = await User.findById(userId)
+      .select("followers")
+      .populate({
+        path: "followers",
+        options: { sort: { createdAt: -1 } },
+      });
+
+    if (!myFollowers.followers) {
+      return res.status(404).json({ error: "Followers not found" });
+    }
+
+    //^ filter followers whom i already shared the post
+    const filterFollowers = myFollowers.followers.filter(
+      (item) => !item.sharedPosts.includes(postId)
+    );
+
+    res.status(200).json(filterFollowers);
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+};

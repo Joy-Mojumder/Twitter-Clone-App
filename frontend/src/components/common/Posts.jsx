@@ -15,6 +15,10 @@ const Posts = ({ feedType, username, userId }) => {
         return `/api/posts/user/${username}`;
       case "likes":
         return `/api/posts/liked/${userId}`;
+      case "saved":
+        return `/api/posts/saved/${userId}`;
+      case "shared":
+        return `/api/posts/shared/${userId}`;
       default:
         return "/api/posts/all";
     }
@@ -63,7 +67,7 @@ const Posts = ({ feedType, username, userId }) => {
       {!isLoading && !isRefetching && POSTS && (
         <div>
           {POSTS.map((post) => (
-            <Post key={post._id} post={post} />
+            <Post key={post._id} post={post} feedType={feedType} />
           ))}
         </div>
       )}

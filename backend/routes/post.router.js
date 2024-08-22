@@ -10,6 +10,10 @@ import {
   getLikedPosts,
   getUserPosts,
   likeUnlikePost,
+  savePosts,
+  getSavedPosts,
+  sharePost,
+  getSharedPosts,
 } from "../controllers/post.controller.js";
 
 const router = express.Router();
@@ -19,6 +23,10 @@ router.get("/all", protectRoute, getAllPosts);
 router.get("/user/:username", protectRoute, getUserPosts);
 router.get("/following", protectRoute, getFollowingPosts);
 router.get("/liked/:userId", protectRoute, getLikedPosts);
+router.get("/saved/:userId", protectRoute, getSavedPosts);
+router.get("/shared/:userId", protectRoute, getSharedPosts);
+router.post("/save/:postId", protectRoute, savePosts);
+router.post("/share/:postId", protectRoute, sharePost);
 router.post("/create", protectRoute, createPost);
 router.post("/like/:postId", protectRoute, likeUnlikePost);
 router.post("/comment/:postId", protectRoute, commentPost);

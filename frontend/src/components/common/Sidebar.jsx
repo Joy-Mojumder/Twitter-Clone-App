@@ -5,6 +5,9 @@ import { Link } from "react-router-dom";
 import { BiLogOut } from "react-icons/bi";
 import { FcMindMap } from "react-icons/fc";
 import { useQuery } from "@tanstack/react-query";
+import { FaShareAlt } from "react-icons/fa";
+import { BiSolidBookmarkAlt } from "react-icons/bi";
+
 import { useLogout } from "../../hooks/useLogout";
 
 const Sidebar = () => {
@@ -52,7 +55,26 @@ const Sidebar = () => {
               <span className="text-lg hidden md:block">Profile</span>
             </Link>
           </li>
+          <li className="flex justify-center md:justify-start">
+            <Link
+              to={`/posts/saved/${authUser?._id}`}
+              className="flex gap-3 items-center hover:bg-stone-900 transition-all rounded-full duration-300 py-2 pl-2 pr-4 max-w-fit cursor-pointer"
+            >
+              <BiSolidBookmarkAlt className="w-6 h-6" />
+              <span className="text-lg hidden md:block">Saved Posts</span>
+            </Link>
+          </li>
+          <li className="flex justify-center md:justify-start">
+            <Link
+              to={`/posts/shared/${authUser?._id}`}
+              className="flex gap-3 items-center hover:bg-stone-900 transition-all rounded-full duration-300 py-2 pl-2 pr-4 max-w-fit cursor-pointer"
+            >
+              <FaShareAlt className="w-6 h-6" />
+              <span className="text-lg hidden md:block">Share Posts</span>
+            </Link>
+          </li>
         </ul>
+
         {authUser && (
           <Link
             to={`/profile/${authUser?.username}`}

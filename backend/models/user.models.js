@@ -35,6 +35,11 @@ const userSchema = new mongoose.Schema(
         default: [],
       },
     ],
+
+    isAdmin: {
+      type: Boolean,
+      default: false,
+    },
     profileImg: {
       type: String,
       default: "",
@@ -52,6 +57,20 @@ const userSchema = new mongoose.Schema(
       default: "",
     },
     likedPosts: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Post",
+        default: [],
+      },
+    ],
+    savedPosts: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Post",
+        default: [],
+      },
+    ],
+    sharedPosts: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Post",

@@ -8,6 +8,8 @@ import NotificationPage from "./pages/notification/NotificationPage";
 import ProfilePage from "./pages/profile/ProfilePage";
 import { Toaster } from "react-hot-toast";
 import { useAuthUser } from "./hooks/useAuthUser";
+import SavedPostPage from "./pages/saved/SavedPostPage";
+import SharePostPage from "./pages/share/SharePostPage";
 
 const App = () => {
   const { authUser, isLoading } = useAuthUser();
@@ -29,6 +31,10 @@ const App = () => {
           element={authUser ? <HomePage /> : <Navigate to="/login" />}
         />
         <Route
+          path="/post/share/:postId"
+          element={authUser ? <HomePage /> : <Navigate to="/login" />}
+        />
+        <Route
           path="/login"
           element={!authUser ? <LoginPage /> : <Navigate to="/" />}
         />
@@ -43,6 +49,14 @@ const App = () => {
         <Route
           path="/profile/:username"
           element={authUser ? <ProfilePage /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/posts/saved/:userId"
+          element={authUser ? <SavedPostPage /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/posts/shared/:userId"
+          element={authUser ? <SharePostPage /> : <Navigate to="/login" />}
         />
       </Routes>
       {authUser && <RightPanel />}

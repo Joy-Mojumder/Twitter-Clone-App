@@ -5,6 +5,9 @@ import { IoSettingsOutline } from "react-icons/io5";
 import { FaUser } from "react-icons/fa";
 import { FaHeart } from "react-icons/fa6";
 import { BiTrash } from "react-icons/bi";
+import { TfiCommentAlt } from "react-icons/tfi";
+import { FaShareAlt } from "react-icons/fa";
+
 import {
   useDeleteAllNotifications,
   useDeleteNotification,
@@ -17,6 +20,7 @@ const NotificationPage = () => {
   const { deleteNotification } = useDeleteNotification();
 
   const { deleteAllNotifications } = useDeleteAllNotifications();
+
   return (
     <>
       <div className="flex-[4_4_0] border-l border-r border-gray-700 min-h-screen">
@@ -55,9 +59,19 @@ const NotificationPage = () => {
               {notification.type === "follow" && (
                 <FaUser className="w-7 h-7 text-primary" />
               )}
+              {notification.type === "comment" && (
+                <TfiCommentAlt
+                  className="w-7 h-7 
+                text-amber-500"
+                />
+              )}
               {notification.type === "like" && (
                 <FaHeart className="w-7 h-7 text-red-500" />
               )}
+              {notification.type === "share" && (
+                <FaShareAlt className="w-7 h-7 text-sky-500" />
+              )}
+
               <Link to={`/profile/${notification.sender.username}`}>
                 <div className="avatar">
                   <div className="w-8 rounded-full">
@@ -74,9 +88,13 @@ const NotificationPage = () => {
                   <span className="font-bold">
                     @{notification.sender.username}
                   </span>{" "}
-                  {notification.type === "follow"
-                    ? "followed you"
-                    : "liked your post"}
+                  {notification.type === "follow" && (
+                    <span>started following you</span>
+                  )}
+                  {notification.type === "comment" && (
+                    <span>commented on your post</span>
+                  )}
+                  {notification.type === "like" && <span>liked your post</span>}
                 </div>
               </Link>
             </div>
