@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import HomePage from "./pages/home/HomePage";
 import LoginPage from "./pages/auth/login/LoginPage";
 import SignUpPage from "./pages/auth/signup/SignUpPage";
@@ -10,8 +10,11 @@ import { Toaster } from "react-hot-toast";
 import { useAuthUser } from "./hooks/useAuthUser";
 import SavedPostPage from "./pages/saved/SavedPostPage";
 import SharePostPage from "./pages/share/SharePostPage";
+import { AnimatePresence } from "framer-motion";
 
 const App = () => {
+  const location = useLocation();
+
   const { authUser, isLoading } = useAuthUser();
 
   if (isLoading) {
@@ -25,40 +28,42 @@ const App = () => {
     <div className="flex max-w-6xl mx-auto">
       {/* common component not wrapped in router */}
       {authUser && <Sidebar />}
-      <Routes>
-        <Route
-          path="/"
-          element={authUser ? <HomePage /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/post/share/:postId"
-          element={authUser ? <HomePage /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/login"
-          element={!authUser ? <LoginPage /> : <Navigate to="/" />}
-        />
-        <Route
-          path="/signup"
-          element={!authUser ? <SignUpPage /> : <Navigate to="/" />}
-        />
-        <Route
-          path="/notifications"
-          element={authUser ? <NotificationPage /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/profile/:username"
-          element={authUser ? <ProfilePage /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/posts/saved/:userId"
-          element={authUser ? <SavedPostPage /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/posts/shared/:userId"
-          element={authUser ? <SharePostPage /> : <Navigate to="/login" />}
-        />
-      </Routes>
+      <AnimatePresence
+        mode="wait"
+        initial={false}
+        onExitComplete={() => window.scrollTo(0, 0)}
+      >
+        <Routes location={location} key={location.pathname}>
+          <Route
+            path="/"
+            element={authUser ? <HomePage /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/login"
+            element={!authUser ? <LoginPage /> : <Navigate to="/" />}
+          />
+          <Route
+            path="/signup"
+            element={!authUser ? <SignUpPage /> : <Navigate to="/" />}
+          />
+          <Route
+            path="/notifications"
+            element={authUser ? <NotificationPage /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/profile/:username"
+            element={authUser ? <ProfilePage /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/posts/saved/:userId"
+            element={authUser ? <SavedPostPage /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/posts/shared/:userId"
+            element={authUser ? <SharePostPage /> : <Navigate to="/login" />}
+          />
+        </Routes>
+      </AnimatePresence>
       {authUser && <RightPanel />}
       <Toaster />
     </div>

@@ -9,10 +9,12 @@ export const getNotifications = async (req, res) => {
     // * find notifications based on userId and populate sender with username and profileImg
     const notifications = await Notification.find({
       receiver: userId,
-    }).populate({
-      path: "sender",
-      select: "username profileImg",
-    });
+    })
+      .sort({ createdAt: -1 })
+      .populate({
+        path: "sender",
+        select: "username profileImg",
+      });
 
     //* update notifications as read
     await Notification.updateMany({ receiver: userId }, { read: true });

@@ -2,6 +2,7 @@ import Post from "./Post";
 import PostSkeleton from "../skeletons/PostSkeleton";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
+import { motion } from "framer-motion";
 
 const Posts = ({ feedType, username, userId }) => {
   //^ get posts endpoint based on feedType
@@ -53,7 +54,11 @@ const Posts = ({ feedType, username, userId }) => {
   }, [feedType, refetch, username]);
 
   return (
-    <>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
       {(isLoading || isRefetching) && (
         <div className="flex flex-col justify-center">
           <PostSkeleton />
@@ -71,7 +76,7 @@ const Posts = ({ feedType, username, userId }) => {
           ))}
         </div>
       )}
-    </>
+    </motion.div>
   );
 };
 export default Posts;

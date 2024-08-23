@@ -13,6 +13,9 @@ import {
   useDeleteNotification,
   useNotifications,
 } from "../../hooks/useNotifications";
+import { formatDate } from "../../utils/date";
+
+import { motion } from "framer-motion";
 
 const NotificationPage = () => {
   const { notifications, isLoadingNotifications } = useNotifications();
@@ -21,9 +24,34 @@ const NotificationPage = () => {
 
   const { deleteAllNotifications } = useDeleteAllNotifications();
 
+  const notificationsVariants = {
+    hidden: { opacity: 1 },
+    visible: {
+      opacity: 1,
+      transition: {
+        delayChildren: 0.3,
+        staggerChildren: 0.2,
+      },
+    },
+  };
+
+  const notificationsItemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+    },
+  };
+
   return (
     <>
-      <div className="flex-[4_4_0] border-l border-r border-gray-700 min-h-screen">
+      <motion.div
+        className="flex-[4_4_0] border-l border-r border-gray-700 min-h-screen"
+        variants={notificationsVariants}
+        initial="hidden"
+        animate="visible"
+        exit={{ opacity: 0 }}
+      >
         <div className="flex justify-between items-center p-4 border-b border-gray-700">
           <p className="font-bold">Notifications</p>
           <div className="dropdown ">
@@ -51,9 +79,10 @@ const NotificationPage = () => {
           </div>
         )}
         {notifications?.map((notification) => (
-          <div
+          <motion.div
             className="border-b border-gray-700 flex justify-between"
             key={notification._id}
+            variants={notificationsItemVariants}
           >
             <div className="flex gap-2 p-4">
               {notification.type === "follow" && (
@@ -74,15 +103,17 @@ const NotificationPage = () => {
 
               <Link to={`/profile/${notification.sender.username}`}>
                 <div className="avatar">
-                  <div className="w-8 rounded-full">
+                  <div className="size-10 rounded-full">
                     <img
                       src={
                         notification.sender.profileImg ||
                         "/avatar-placeholder-image.jpg"
                       }
                     />
-                    <p>{}</p>
                   </div>
+                  <p className="text-sm mx-2">
+                    {formatDate(notification.createdAt)}
+                  </p>
                 </div>
                 <div className="flex gap-1">
                   <span className="font-bold">
@@ -107,9 +138,9 @@ const NotificationPage = () => {
                 onClick={() => deleteNotification(notification._id)}
               />
             </div>
-          </div>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
     </>
   );
 };

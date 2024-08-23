@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { motion } from "framer-motion";
 
 import CreatePost from "./CreatePost";
 import Posts from "../../components/common/Posts";
@@ -7,7 +8,12 @@ const HomePage = () => {
 
   return (
     <>
-      <div className="flex-[4_4_0] mr-auto border-r border-gray-700 min-h-screen">
+      <motion.div
+        className="flex-[4_4_0] mr-auto border-r border-gray-700 min-h-screen"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      >
         {/* Header */}
         <div className="flex w-full border-b border-gray-700">
           <div
@@ -37,7 +43,7 @@ const HomePage = () => {
 
         {/* POSTS */}
         <Posts feedType={feedType} />
-      </div>
+      </motion.div>
     </>
   );
 };

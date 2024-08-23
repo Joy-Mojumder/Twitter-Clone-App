@@ -4,6 +4,7 @@ import { Link, useParams } from "react-router-dom";
 import Posts from "../../components/common/Posts";
 import ProfileHeaderSkeleton from "../../components/skeletons/ProfileHeaderSkeleton";
 import EditProfileModel from "./EditProfileModel";
+import { motion } from "framer-motion";
 
 import { FaArrowLeft } from "react-icons/fa6";
 import { IoCalendarOutline } from "react-icons/io5";
@@ -72,7 +73,12 @@ const ProfilePage = () => {
 
   return (
     <>
-      <div className="flex-[4_4_0]  border-r border-gray-700 min-h-screen ">
+      <motion.div
+        className="flex-[4_4_0]  border-r border-gray-700 min-h-screen "
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      >
         {/* HEADER */}
         {isLoading || (isRefetching && <ProfileHeaderSkeleton />)}
         {!isLoading && !isRefetching && !user && (
@@ -247,7 +253,7 @@ const ProfilePage = () => {
 
           <Posts feedType={feedType} username={username} userId={user?._id} />
         </div>
-      </div>
+      </motion.div>
     </>
   );
 };

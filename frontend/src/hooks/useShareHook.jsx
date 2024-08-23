@@ -1,13 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 export const useSuggestedFollowers = () => {
-  const { postId } = useParams();
+  const postId = useSelector((state) => state.path.value);
 
   const {
     data: suggestedFollowers,
+    isRefetching: isSFloading,
     refetch,
-    isRefetching: isRefetchingShare,
   } = useQuery({
     queryKey: ["suggestedFollowers"],
     queryFn: async () => {
@@ -23,5 +23,5 @@ export const useSuggestedFollowers = () => {
       }
     },
   });
-  return { suggestedFollowers, refetch, isRefetchingShare };
+  return { suggestedFollowers, isSFloading, refetch, postId };
 };

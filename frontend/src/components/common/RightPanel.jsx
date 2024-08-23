@@ -1,10 +1,13 @@
-import { Link } from "react-router-dom";
 import RightPanelSkeleton from "../skeletons/RightPanelSkeleton";
 import { useRTSuggestedUsers } from "../../hooks/useRTSuggestedUsers";
 import { useFollowUnfollowUsers } from "../../hooks/useFollowUnfollowUsers";
+import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 const RightPanel = () => {
   const { suggestedRtUsers, isLoadingSuggested } = useRTSuggestedUsers();
+
+  const navigate = useNavigate();
 
   const { followUnfollowUser, isPendingFollowUnfollow } =
     useFollowUnfollowUsers();
@@ -12,8 +15,34 @@ const RightPanel = () => {
   const handleFollowUnfollowUser = (userId) => {
     followUnfollowUser(userId);
   };
+
+  const rightPanelVariants = {
+    hidden: { opacity: 1 },
+    visible: {
+      opacity: 1,
+      transition: {
+        delayChildren: 0.5,
+        staggerChildren: 0.5,
+      },
+    },
+  };
+
+  const rightPanelItemVariants = {
+    hidden: { y: 50, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+    },
+  };
+
   return (
-    <div className="hidden lg:block my-4 mx-2">
+    <motion.div
+      className="hidden lg:block my-4 mx-2"
+      variants={rightPanelVariants}
+      initial="hidden"
+      animate="visible"
+      exit={{ opacity: 0 }}
+    >
       <div className="bg-[#16181C] p-4 rounded-md sticky top-2">
         <p className="font-bold">Who to follow</p>
         <div className="flex flex-col gap-4">
@@ -28,10 +57,11 @@ const RightPanel = () => {
           )}
           {!isLoadingSuggested &&
             suggestedRtUsers?.map((user) => (
-              <Link
-                to={`/profile/${user.username}`}
-                className="flex items-center justify-between gap-4"
+              <motion.div
                 key={user._id}
+                className="flex items-center justify-between gap-4"
+                variants={rightPanelItemVariants}
+                onClick={() => navigate(`/profile/${user.username}`)}
               >
                 <div className="flex gap-2 items-center">
                   <div className="avatar">
@@ -63,11 +93,11 @@ const RightPanel = () => {
                     )}
                   </button>
                 </div>
-              </Link>
+              </motion.div>
             ))}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 export default RightPanel;

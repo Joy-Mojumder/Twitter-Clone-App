@@ -9,9 +9,12 @@ import { FaShareAlt } from "react-icons/fa";
 import { BiSolidBookmarkAlt } from "react-icons/bi";
 
 import { useLogout } from "../../hooks/useLogout";
+import { useNotifications } from "../../hooks/useNotifications";
 
 const Sidebar = () => {
   const { logout } = useLogout();
+
+  const { notifications } = useNotifications();
 
   const { data: authUser } = useQuery({
     queryKey: ["authUser"],
@@ -39,10 +42,17 @@ const Sidebar = () => {
           <li className="flex justify-center md:justify-start">
             <Link
               to="/notifications"
-              className="flex gap-3 items-center hover:bg-stone-900 transition-all rounded-full duration-300 py-2 px-2 md:pl-2 md:pr-4 max-w-fit cursor-pointer"
+              className={`flex gap-3 items-center indicator hover:bg-stone-900 transition-all rounded-full duration-300 py-2 px-2 md:pl-2 md:pr-4 max-w-fit cursor-pointer ${
+                notifications?.length > 0 && "bg-stone-950"
+              }`}
             >
               <IoNotifications className="w-6 h-6" />
               <span className="text-lg hidden md:block">Notifications</span>
+              <span className="indicator-item badge rounded-full bg-red-500">
+                {notifications?.length > 0 && notifications?.length < 100
+                  ? notifications?.length
+                  : "99+"}
+              </span>
             </Link>
           </li>
 

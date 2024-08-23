@@ -6,7 +6,7 @@ import { FaTrash } from "react-icons/fa";
 import { FaChartSimple } from "react-icons/fa6";
 
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useLikeUnlikePosts } from "../../hooks/useLikeUnlikePosts";
 import { useCommenting } from "../../hooks/useCommenting";
@@ -16,6 +16,8 @@ import { useSavePosts } from "../../hooks/useSavePosts";
 import RightPanelSkeleton from "../skeletons/RightPanelSkeleton";
 import { useSuggestedFollowers } from "../../hooks/useShareHook";
 import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { setPath } from "../../store/store";
 
 const Post = ({ post, feedType }) => {
   // ^ set comment
@@ -26,8 +28,6 @@ const Post = ({ post, feedType }) => {
 
   //^ get auth user from data query
   const { data: authUser } = useQuery({ queryKey: ["authUser"] });
-
-  const navigate = useNavigate();
 
   //^ set post seen or not
   const [postSeen, setPostSeen] = useState({
@@ -51,10 +51,8 @@ const Post = ({ post, feedType }) => {
     saved: post.saves?.includes(authUser?._id),
   });
 
-  const { suggestedFollowers, refetch, isRefetchingShare } =
+  const { suggestedFollowers, isSFloading, refetch, postId } =
     useSuggestedFollowers();
-
-  const { postId } = useParams();
 
   useEffect(() => {
     refetch();
@@ -84,7 +82,6 @@ const Post = ({ post, feedType }) => {
     },
     onSuccess: (data) => {
       toast.success(data.message);
-
       refetch();
     },
     onError: (error) => {
@@ -100,6 +97,8 @@ const Post = ({ post, feedType }) => {
       return share.sender.includes(authUser._id);
     }
   });
+
+  const dispatch = useDispatch();
 
   const [isShare, setIsShare] = useState({
     share: feedType === "shared" ? sender : sender.includes(true),
@@ -372,17 +371,16 @@ const Post = ({ post, feedType }) => {
               </dialog>
               <div
                 className="flex gap-1 items-center cursor-pointer group"
-                onClick={() =>
-                  document.getElementById("share_modal" + post._id).showModal()
-                }
+                onClick={() => {
+                  document.getElementById("share_modal" + post._id).showModal();
+                  dispatch(setPath(post._id));
+                }}
               >
-                <Link to={`/post/share/${post._id}`}>
-                  <BiRepost
-                    className={`size-6 group-hover:text-green-500 ${
-                      isShare.share ? "text-green-500" : "text-slate-500"
-                    }`}
-                  />
-                </Link>
+                <BiRepost
+                  className={`size-6 group-hover:text-green-500 ${
+                    isShare.share ? "text-green-500" : "text-slate-500"
+                  }`}
+                />
                 <span className="text-sm text-slate-500 group-hover:text-green-500">
                   {isShare.shareCount}
                 </span>
@@ -399,7 +397,7 @@ const Post = ({ post, feedType }) => {
                   <div className="bg-[#16181C] sticky ">
                     <div className="flex flex-col gap-4">
                       {/* item */}
-                      {isRefetchingShare && (
+                      {isSFloading && (
                         <>
                           <RightPanelSkeleton />
                           <RightPanelSkeleton />
@@ -409,7 +407,7 @@ const Post = ({ post, feedType }) => {
                       )}
 
                       {suggestedFollowers?.length !== 0 &&
-                        !isRefetchingShare &&
+                        !isSFloading &&
                         suggestedFollowers?.map((user) => (
                           <div
                             key={user._id}
@@ -455,22 +453,16 @@ const Post = ({ post, feedType }) => {
                             </div>
                           </div>
                         ))}
-                      {suggestedFollowers?.length === 0 &&
-                        !isRefetchingShare && (
-                          <p className="text-sm text-slate-500 text-center">
-                            No one to share with
-                          </p>
-                        )}
+                      {suggestedFollowers?.length === 0 && !isSFloading && (
+                        <p className="text-sm text-slate-500 text-center">
+                          No one to share with
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
                 <form method="dialog" className="modal-backdrop">
-                  <button
-                    className="outline-none"
-                    onClick={() => navigate("/")}
-                  >
-                    close
-                  </button>
+                  <button className="outline-none">close</button>
                 </form>
               </dialog>
               {isPendingLike ? (
