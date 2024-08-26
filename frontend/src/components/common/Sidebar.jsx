@@ -1,7 +1,7 @@
 import { MdHomeFilled } from "react-icons/md";
 import { IoNotifications } from "react-icons/io5";
 import { FaUser } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { BiLogOut } from "react-icons/bi";
 import { FcMindMap } from "react-icons/fc";
 import { useQuery } from "@tanstack/react-query";
@@ -31,19 +31,19 @@ const Sidebar = () => {
         </Link>
         <ul className="flex flex-col gap-3 mt-4">
           <li className="flex justify-center md:justify-start">
-            <Link
+            <NavLink
               to="/"
-              className="flex gap-3 items-center hover:bg-stone-900 transition-all rounded-full duration-300 py-2 px-2 md:pl-2 md:pr-4 max-w-fit cursor-pointer"
+              className="flex gap-3 items-center hover:bg-stone-800 transition-all rounded-full duration-300 py-2 px-2 md:pl-2 md:pr-4 max-w-fit cursor-pointer"
             >
               <MdHomeFilled className="w-8 h-8" />
               <span className="text-lg hidden md:block">Home</span>
-            </Link>
+            </NavLink>
           </li>
           <li className="flex justify-center md:justify-start">
-            <Link
+            <NavLink
               to="/notifications"
-              className={`flex gap-3 items-center indicator hover:bg-stone-900 transition-all rounded-full duration-300 py-2 px-2 md:pl-2 md:pr-4 max-w-fit cursor-pointer ${
-                notifications?.length > 0 && "bg-stone-950"
+              className={`flex gap-3 items-center indicator hover:bg-stone-800 transition-all rounded-full duration-300 py-2 px-2 md:pl-2 md:pr-4 max-w-fit cursor-pointer ${
+                notifications?.length > 0 && "bg-stone-950/80"
               }`}
             >
               <IoNotifications className="w-6 h-6" />
@@ -53,35 +53,35 @@ const Sidebar = () => {
                   ? notifications?.length
                   : "99+"}
               </span>
-            </Link>
+            </NavLink>
           </li>
 
           <li className="flex justify-center md:justify-start">
-            <Link
+            <NavLink
               to={`/profile/${authUser?.username}`}
-              className="flex gap-3 items-center hover:bg-stone-900 transition-all rounded-full duration-300 py-2 px-2 md:pl-2 md:pr-4 max-w-fit cursor-pointer"
+              className="flex gap-3 items-center hover:bg-stone-800 transition-all rounded-full duration-300 py-2 px-2 md:pl-2 md:pr-4 max-w-fit cursor-pointer"
             >
               <FaUser className="w-6 h-6" />
               <span className="text-lg hidden md:block">Profile</span>
-            </Link>
+            </NavLink>
           </li>
           <li className="flex justify-center md:justify-start">
-            <Link
+            <NavLink
               to={`/posts/saved/${authUser?._id}`}
-              className="flex gap-3 items-center hover:bg-stone-900 transition-all rounded-full duration-300 py-2 px-2 md:pl-2 md:pr-4 max-w-fit cursor-pointer"
+              className="flex gap-3 items-center hover:bg-stone-800 transition-all rounded-full duration-300 py-2 px-2 md:pl-2 md:pr-4 max-w-fit cursor-pointer"
             >
               <BiSolidBookmarkAlt className="w-6 h-6" />
               <span className="text-lg hidden md:block">Saved Posts</span>
-            </Link>
+            </NavLink>
           </li>
           <li className="flex justify-center md:justify-start">
-            <Link
+            <NavLink
               to={`/posts/shared/${authUser?._id}`}
-              className="flex gap-3 items-center hover:bg-stone-900 transition-all rounded-full duration-300 py-2 px-2 md:pl-2 md:pr-4 max-w-fit cursor-pointer"
+              className="flex gap-3 items-center hover:bg-stone-800 transition-all rounded-full duration-300 py-2 px-2 md:pl-2 md:pr-4 max-w-fit cursor-pointer"
             >
               <FaShareAlt className="w-6 h-6" />
               <span className="text-lg hidden md:block">Share Posts</span>
-            </Link>
+            </NavLink>
           </li>
         </ul>
 
